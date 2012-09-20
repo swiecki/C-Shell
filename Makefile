@@ -5,9 +5,9 @@ CFLAGS = -g -Wall
 # main executable file first
 TARGET = shell
 # object files next
-OBJS = main.o
+OBJS = helpers.o main.o
 # header files next
-DEPS =
+DEPS = helpers.h
 .PHONY : clean
 
 all: $(TARGET)
