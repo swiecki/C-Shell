@@ -30,19 +30,27 @@ int main(int argc, char **argv) {
   
 	char buffer[1024];
 	while (fgets(buffer, 1024, stdin) != NULL) {
-		//ignore comment
-		removeComment(buffer);
+		//fastforward exit if possible-- the purpose of this is extra responsiveness
+		if(buffer[0] == 'e' && buffer[1] == 'x' && buffer[2] == 'i' && buffer[3] == 't'){
+			exit(0);
+		}
 
+		//remove any comment at the end of the line
+		removeComment(buffer);
+		
 		//Remove whitespace from buffer string
 		// whitespace removal is currently too overzealous-- things like "e x i t" work...
 		//removewhitespace(buffer);
 
-		//split buffer by semicolons- each will be an executable command
-		//get upper bound for number of array items
+		//Tokenize buffer by semicolons- each will be an executable command
 		printf("\nReading %i commands\n",commandSplit(buffer));
+		
+		//Tokenize buffer array by spaces
 
 		//execute commands in a loop:
-		//exit if asked
+
+		//first check for built in commands, else run external command
+		//exit TODO: change buffer to the token we are currently looping through
 		if(strcmp(buffer, "exit")==0){
 			 exit(0);
 		}
@@ -68,7 +76,7 @@ int main(int argc, char **argv) {
 			same process id */ 
 			assert(p == childp);
 
-			//printf("Parent got carcass of child process %d, return val %d\n", childp, rstatus);
+			printf("Parent got carcass of child process %d, return val %d\n", childp, rstatus);
 		} else {
 			/* fork had an error; bail out */
 			// fprintf(stderr, "fork failed: %s\n", strerror(errno));
