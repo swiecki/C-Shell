@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
 		//Tokenize buffer by semicolons- each will be an executable command
 		printf("\nReading %i commands\n",commandSplit(buffer));
 		
-		//Tokenize buffer array by spaces
+		//Tokenize buffer array by spaces -- the purpose of this is to get it ready for execv call
 
 		//execute commands in a loop:
 
