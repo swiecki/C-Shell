@@ -77,7 +77,6 @@ char** tokenify(char *s, const char *sep)
 	char **array = malloc(sizeof(char*)*(words+1));
 	int i = 0;
 	for (word = strtok(temp2, sep); word; word = strtok(NULL, sep)) {
-		printf("adding word %s to array pos %d\n", word, i);
 		array[i] = strdup(word);
 		i++;
 	}
@@ -99,6 +98,7 @@ char ***tokenify2(char **s, const char *sep)
 	int i = 0;
 	while(s[i] != NULL){
 		toreturn[i] = tokenify(s[i], sep);
+		i++;
 	}
 	return toreturn;
 }

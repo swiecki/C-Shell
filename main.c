@@ -24,6 +24,7 @@
 
 
 int main(int argc, char **argv) {
+	int mode = 0;//paralell
 	char *prompt = "term> ";
 	printf("%s", prompt);
 	fflush(stdout);
@@ -42,21 +43,47 @@ int main(int argc, char **argv) {
 		char **firststep = tokenify(buffer,";");
 		char ***secondstep = tokenify2(firststep," \t\n");
 
-		free(firststep);
+//		freeAll1(firststep);
 		int j = 0;
+
+		pid_t p;
 		//execute commands in a loop:
-		while(secondstep[j] != NULL){
-			pid_t p = fork();
-			if (p == 0){
-				break;
+		while(secondstep[j] !=  NULL){
+			//check for exit or mode, else fork
+			if(!strcmp(secondstep[j][0],"exit")){
+				//freeAll2(secondstep);
+				exit(0);
 			}
-			//waitpid(p);
+			else if(!strcasecmp(secondstep[j][0],"MODE")){
+				if(secondstep[j][1] == NULL){
+					printf("\nCurrent mode is %i\n", mode);
+				}
+				else if(!strcmp(secondstep[j][1],"PARALLEL")){
+					mode = 0;
+				}
+				else if(!strcmp(secondstep[j][1],"SEQUENTIAL")){
+					mode = 1;
+				}
+				else {
+					//bullshit users with their bullshit commands- throw error
+				}
+			}
+			else{
+				//wasn't built in command, better use execv
+				p = fork();
+				if (p == 0){
+					break;
+				}
+				if(mode==1){
+					//waitpid(p);
+				}
+			}
 			j++;
 		}
-
-	  printf("%s",secondstep[j][0]);
-
-		printf("\n%s\n", buffer);
+		
+		if (p == 0){
+	  printf("\n%s\n",secondstep[j][0]);
+		}
 		//char *cmd[] = { "/bin/ls", "-ltr", ".", NULL };
 
 		//if (p == 0) {
