@@ -59,3 +59,29 @@ int commandSplit(char *s1){
 	free(temp1);
 	return commands;
 }
+
+char** tokenify(char *s, const char *sep)
+{
+	char *word = NULL;
+	//copy string
+	char *temp1 = strdup(s);
+	char *temp2 = strdup(s);
+	
+	//find out how many tokens we have
+	int words = 0;
+	for (word = strtok(temp1, sep);word;word = strtok(NULL,sep)){words++;}
+
+	//allocate teh array of char *'s with one additional
+	char **array = malloc(sizeof(char*)*(words+1));
+	int i = 0;
+	for (word = strtok(temp2, sep); word; word = strtok(NULL, sep)) {
+		printf("adding word %s to array pos %d\n", word, i);
+		array[i] = strdup(word);
+		i++;
+	}
+
+	free(temp1);
+	free(temp2);
+	array[words] = NULL;
+	return array;
+}
