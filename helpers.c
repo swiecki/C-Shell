@@ -62,6 +62,7 @@ int commandSplit(char *s1){
 
 char** tokenify(char *s, const char *sep)
 {
+	//this comment is new
 	char *word = NULL;
 	//copy string
 	char *temp1 = strdup(s);
