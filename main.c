@@ -40,48 +40,47 @@ int main(int argc, char **argv) {
 		//Tokenize buffer by semicolons- each will be an executable command
 		
 		char **firststep = tokenify(buffer,";");
-		char ***secondstep = tokenify2(**firststep," \t\n");
+		char ***secondstep = tokenify2(firststep," \t\n");
 
 		free(firststep);
-
-		printf("\nReading %i commands\n",commandSplit(buffer));
-		
-		//Tokenize buffer array by spaces -- the purpose of this is to get it ready for execv call
-
+		int j = 0;
 		//execute commands in a loop:
-
-		//first check for built in commands, else run external command
-		//exit TODO: change buffer to the token we are currently looping through
-		if(strcmp(buffer, "exit")==0){
-			 exit(0);
+		while(secondstep[j] != NULL){
+			pid_t p = fork();
+			if (p == 0){
+				break;
+			}
+			//waitpid(p);
+			j++;
 		}
+
+	  printf("%s",secondstep[j][0]);
 
 		printf("\n%s\n", buffer);
 		//char *cmd[] = { "/bin/ls", "-ltr", ".", NULL };
 
-		pid_t p = fork();
-		if (p == 0) {
+		//if (p == 0) {
 			/* in child */
 			// if (execv(cmd[0], cmd) < 0) {
 			//     fprintf(stderr, "execv failed: %s\n", strerror(errno));
 			// }
-			exit(0);
+		//	exit(0);
 
-		} else if (p > 0) {
+		//} else if (p > 0) {
 			/* in parent */
-			int rstatus = 0;
-			pid_t childp = wait(&rstatus);
+			//int rstatus = 0;
+			//pid_t childp = wait(&rstatus);
 
 			/* for this simple starter code, the only child process we should
 			"wait" for is the one we just spun off, so check that we got the
 			same process id */ 
-			assert(p == childp);
+			//assert(p == childp);
 
-			printf("Parent got carcass of child process %d, return val %d\n", childp, rstatus);
-		} else {
+			//printf("Parent got carcass of child process %d, return val %d\n", childp, rstatus);
+		///} else {
 			/* fork had an error; bail out */
 			// fprintf(stderr, "fork failed: %s\n", strerror(errno));
-		}
+		//}
 
 		printf("%s", prompt);
 		fflush(stdout);
