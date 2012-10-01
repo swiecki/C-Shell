@@ -46,9 +46,9 @@ int main(int argc, char **argv) {
 //		freeAll1(firststep);
 		int j = 0;
 
-		pid_t p;
+		pid_t p = 1;
 		//execute commands in a loop:
-		while(secondstep[j] !=  NULL){
+		while(secondstep[j] !=  NULL && secondstep[j][0] != NULL){
 			//check for exit or mode, else fork
 			if(!strcmp(secondstep[j][0],"exit")){
 				//freeAll2(secondstep);
