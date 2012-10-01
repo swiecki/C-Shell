@@ -30,11 +30,6 @@ int main(int argc, char **argv) {
   
 	char buffer[1024];
 	while (fgets(buffer, 1024, stdin) != NULL) {
-		//fastforward exit if possible-- the purpose of this is extra responsiveness
-		if(buffer[0] == 'e' && buffer[1] == 'x' && buffer[2] == 'i' && buffer[3] == 't'){
-			exit(0);
-		}
-
 		//remove any comment at the end of the line
 		removeComment(buffer);
 		
@@ -43,6 +38,12 @@ int main(int argc, char **argv) {
 		//removewhitespace(buffer);
 
 		//Tokenize buffer by semicolons- each will be an executable command
+		
+		char **firststep = tokenify(buffer,";");
+		char ***secondstep = tokenify2(**firststep," \t\n");
+
+		free(firststep);
+
 		printf("\nReading %i commands\n",commandSplit(buffer));
 		
 		//Tokenize buffer array by spaces -- the purpose of this is to get it ready for execv call
