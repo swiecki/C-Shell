@@ -86,3 +86,18 @@ char** tokenify(char *s, const char *sep)
 	array[words] = NULL;
 	return array;
 }
+
+char ***tokenify2(char **s, const char *sep)
+{
+	int f = 0;
+	while(s[f] != NULL){
+		f++;
+	}
+	char ***toreturn = malloc((sizeof(char **))*(f+1));
+	toreturn[f] = NULL;
+	int i = 0;
+	while(s[i] != NULL){
+		toreturn[i] = tokenify(s[i], sep);
+	}
+	return toreturn;
+}
