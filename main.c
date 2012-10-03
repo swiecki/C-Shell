@@ -24,13 +24,16 @@
 
 
 int main(int argc, char **argv) {
-	int mode = 0;//paralell
-	char *prompt = "term> ";
+	int mode = 1;//paralell
+	int futuremode = mode;
+	char *prompt = "s-term> ";
 	printf("%s", prompt);
 	fflush(stdout);
   
 	char buffer[1024];
 	while (fgets(buffer, 1024, stdin) != NULL) {
+		mode = futuremode;
+
 		//remove any comment at the end of the line
 		removeComment(buffer);
 		
@@ -79,10 +82,10 @@ int main(int argc, char **argv) {
 					printf("\nCurrent mode is %i\n", mode);
 				}
 				else if(!strcasecmp(secondstep[j][1],"PARALLEL")){
-					mode = 0;
+					futuremode = 0;
 				}
 				else if(!strcasecmp(secondstep[j][1],"SEQUENTIAL")){
-					mode = 1;
+					futuremode = 1;
 				}
 				else {
 					//bullshit users with their bullshit commands- throw error
