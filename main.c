@@ -46,26 +46,47 @@ int main(int argc, char **argv) {
 //		freeAll1(firststep);
 		int j = 0;
 
+		int status = 0;
+
 		pid_t p = 1;
 		//execute commands in a loop:
 		while(secondstep[j] !=  NULL && secondstep[j][0] != NULL){
 			//check for exit or mode, else fork
-			if(!strcmp(secondstep[j][0],"exit")){
+			if(!strcasecmp(secondstep[j][0],"exit")){
 				//freeAll2(secondstep);
+				
+				//Check time spent in user mode and kernel mode. Right now I've got it separated by shell and processes, but we can add it together later.
+				int idParent = RUSAGE_SELF;
+				int idChild = RUSAGE_CHILDREN;
+				int statParent = 0;
+				int statChildren = 0;
+				struct rusage dataParent;
+				struct rusage dataChildren;
+				statParent = getrusage(idParent, &dataParent);
+				statChildren = getrusage(idChild, &dataChildren);
+				if(!statParent){//If the getrvalue operation was a success
+					printf("Shell time in user mode: %ld.%06ld seconds.\n", dataParent.ru_utime.tv_sec, dataParent.ru_utime.tv_usec);
+					printf("Shell time in kernel mode: %ld.%06ld seconds. \n", dataParent.ru_stime.tv_sec, dataParent.ru_stime.tv_usec);
+				}
+				if(!statChildren){
+					printf("Process time in user mode: %ld.%06ld seconds. \n", dataChildren.ru_utime.tv_sec, dataChildren.ru_utime.tv_usec);
+					printf("Process time in kernel mode: %ld.%06ld seconds. \n", dataChildren.ru_stime.tv_sec, dataChildren.ru_stime.tv_usec);
+				}
 				exit(0);
 			}
 			else if(!strcasecmp(secondstep[j][0],"MODE")){
 				if(secondstep[j][1] == NULL){
 					printf("\nCurrent mode is %i\n", mode);
 				}
-				else if(!strcmp(secondstep[j][1],"PARALLEL")){
+				else if(!strcasecmp(secondstep[j][1],"PARALLEL")){
 					mode = 0;
 				}
-				else if(!strcmp(secondstep[j][1],"SEQUENTIAL")){
+				else if(!strcasecmp(secondstep[j][1],"SEQUENTIAL")){
 					mode = 1;
 				}
 				else {
 					//bullshit users with their bullshit commands- throw error
+					printf("\nError: Your command was pretty awful.\n");
 				}
 			}
 			else{
@@ -74,15 +95,30 @@ int main(int argc, char **argv) {
 				if (p == 0){
 					break;
 				}
-				if(mode==1){
-					//waitpid(p);
+				if(mode==1){//Sequential mode
+					pid_t childp = wait(&status);
+					//Do something with childp; error checking, probably
 				}
 			}
 			j++;
 		}
 		
 		if (p == 0){
-	  printf("\n%s\n",secondstep[j][0]);
+			//Execv for an actual, non-hardcoded command.
+			printf("\n%s\n",secondstep[j][0]);
+			if(execv(secondstep[j][0],secondstep[j])<0){
+				fprintf(stderr, "Your command failed, and here's why you're a bad person: %s\n", strerror(errno));
+			}
+			exit(0);
+		} 
+
+		if (mode==0){
+			//For each command, wait
+			int pnum = 0;
+			while(secondstep[pnum]!=NULL && secondstep[pnum][0] != NULL){
+				pid_t childp = wait(&status);//Do something with childp, probably error checking
+				pnum++;
+			}	
 		}
 		//char *cmd[] = { "/bin/ls", "-ltr", ".", NULL };
 
@@ -112,6 +148,7 @@ int main(int argc, char **argv) {
 		printf("%s", prompt);
 		fflush(stdout);
 }
+	//Ctrl+D will drop you down here; need to make sure any cleanup also happens here too. 
 	return 0;
 }
 
