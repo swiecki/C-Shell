@@ -77,8 +77,13 @@ char** tokenify(char *s, const char *sep)
 	char **array = malloc(sizeof(char*)*(words+1));
 	int i = 0;
 	for (word = strtok(temp2, sep); word; word = strtok(NULL, sep)) {
-		array[i] = strdup(word);
-		i++;
+		char *tempword = strdup(word);
+		removeWhitespace(tempword);
+		if(!(tempword[0]=='\0')){
+			array[i] = strdup(word);
+			i++;
+		}
+		free(tempword);
 	}
 
 	free(temp1);
