@@ -37,10 +37,6 @@ int main(int argc, char **argv) {
 		//remove any comment at the end of the line
 		removeComment(buffer);
 		
-		//Remove whitespace from buffer string
-		// whitespace removal is currently too overzealous-- things like "e x i t" work...
-		//removewhitespace(buffer);
-
 		//Tokenize buffer by semicolons- each will be an executable command
 		
 		char **firststep = tokenify(buffer,";");
@@ -81,10 +77,10 @@ int main(int argc, char **argv) {
 				if(secondstep[j][1] == NULL){
 					printf("\nCurrent mode is %i\n", mode);
 				}
-				else if(!strcasecmp(secondstep[j][1],"PARALLEL")){
+				else if(!strcasecmp(secondstep[j][1],"PARALLEL") || !strcasecmp(secondstep[j][1],"p")){
 					futuremode = 0;
 				}
-				else if(!strcasecmp(secondstep[j][1],"SEQUENTIAL")){
+				else if(!strcasecmp(secondstep[j][1],"SEQUENTIAL") || !strcasecmp(secondstep[j][1],"s")){
 					futuremode = 1;
 				}
 				else {
@@ -123,30 +119,6 @@ int main(int argc, char **argv) {
 				pnum++;
 			}	
 		}
-		//char *cmd[] = { "/bin/ls", "-ltr", ".", NULL };
-
-		//if (p == 0) {
-			/* in child */
-			// if (execv(cmd[0], cmd) < 0) {
-			//     fprintf(stderr, "execv failed: %s\n", strerror(errno));
-			// }
-		//	exit(0);
-
-		//} else if (p > 0) {
-			/* in parent */
-			//int rstatus = 0;
-			//pid_t childp = wait(&rstatus);
-
-			/* for this simple starter code, the only child process we should
-			"wait" for is the one we just spun off, so check that we got the
-			same process id */ 
-			//assert(p == childp);
-
-			//printf("Parent got carcass of child process %d, return val %d\n", childp, rstatus);
-		///} else {
-			/* fork had an error; bail out */
-			// fprintf(stderr, "fork failed: %s\n", strerror(errno));
-		//}
 
 		printf("%s", prompt);
 		fflush(stdout);
