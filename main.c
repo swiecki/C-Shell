@@ -72,7 +72,12 @@ int main(int argc, char **argv) {
 			}
 			else if(!strcasecmp(secondstep[j][0],"MODE")){
 				if(secondstep[j][1] == NULL){
-					printf("\nCurrent mode is %i\n", mode);
+					if(mode == 0){
+						printf("\nCurrent mode is parallel\n");
+					}
+					else {
+						printf("\nCurrent mode is sequential\n");
+					}
 				}
 				else if(!strcasecmp(secondstep[j][1],"PARALLEL") || !strcasecmp(secondstep[j][1],"p")){
 					futuremode = 0;
