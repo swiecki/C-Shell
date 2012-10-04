@@ -107,17 +107,19 @@ int main(int argc, char **argv) {
 				pnum++;
 			}	
 		}
+		//check if there was an exit command earlier
 		if(futureExit == 1){
 			break;
 		}
 
-		//If we don't exit, free current buffer stuff
+		//If we don't exit, free current buffer
 		freeAll2(secondstep);	
 		free(secondstep);
 
 		printf("%s", prompt);
 		fflush(stdout);
 }
+		//on a quit, flush our command array if it's not null already
 		if(secondstep != NULL){
 			freeAll2(secondstep);
 			free(secondstep);

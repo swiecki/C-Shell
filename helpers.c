@@ -51,16 +51,6 @@ void removeWhitespace(char *s1){
 	buffer[j] = '\0';
 	strcpy(s1,buffer);
 }
-int commandSplit(char *s1){
-	const char *sep = ";";
-	char *command = NULL;
-	char *temp1 = strdup(s1);
-	int commands =0;
-	for (command = strtok(temp1, sep);command;command = strtok(NULL, sep)){ commands++;}
-	free(temp1);
-	return commands;
-}
-
 char** tokenify(char *s, const char *sep)
 {
 	//this comment is new
@@ -99,12 +89,15 @@ char** tokenify(char *s, const char *sep)
 char ***tokenify2(char **s, const char *sep)
 {
 	int f = 0;
+	//count how big our array is
 	while(s[f] != NULL){
 		f++;
 	}
+	//allocate an array to hold all of our subarrays
 	char ***toreturn = malloc((sizeof(char **))*(f+1));
 	toreturn[f] = NULL;
 	int i = 0;
+	//tokenify the substrings into arrays that go into the new array
 	while(s[i] != NULL){
 		toreturn[i] = tokenify(s[i], sep);
 		i++;
@@ -113,6 +106,7 @@ char ***tokenify2(char **s, const char *sep)
 }
 
 void freeAll1(char **array){
+//free all memory in a **char
 	int i = 0;
 	while(array[i]!=NULL){
 		free(array[i]);
@@ -121,6 +115,7 @@ void freeAll1(char **array){
 }
 
 void freeAll2(char ***array){
+//free all memory in a ***char
 	int i = 0;
 	while(array[i]!=NULL){
 		int j = 0;
