@@ -42,7 +42,9 @@ int main(int argc, char **argv) {
 		char **firststep = tokenify(buffer,";");
 		char ***secondstep = tokenify2(firststep," \t\n");
 
-//		freeAll1(firststep);
+		freeAll1(firststep);
+		free(firststep);
+	
 		int j = 0;
 
 		int status = 0;
@@ -52,7 +54,8 @@ int main(int argc, char **argv) {
 		while(secondstep[j] !=  NULL && secondstep[j][0] != NULL){
 			//check for exit or mode, else fork
 			if(!strcasecmp(secondstep[j][0],"exit")){
-				//freeAll2(secondstep);
+				freeAll2(secondstep);
+				free(secondstep);
 				
 				//Check time spent in user mode and kernel mode. Right now I've got it separated by shell and processes, but we can add it together later.
 				int idParent = RUSAGE_SELF;
@@ -120,6 +123,9 @@ int main(int argc, char **argv) {
 			}	
 		}
 
+		freeAll2(secondstep);	
+		free(secondstep);
+		
 		printf("%s", prompt);
 		fflush(stdout);
 }
