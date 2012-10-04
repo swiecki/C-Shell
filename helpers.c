@@ -127,3 +127,43 @@ void freeAll2(char ***array){
 		i++;
 	}
 }
+char **readFile(char *filename){
+	FILE *f;
+	char c;
+	char s[1024];
+	int lines = 0;
+	//find out how big of an array to allocate
+	f = fopen(filename, "r");
+
+	if(f == NULL){
+		return NULL;
+	}
+	while((c=fgetc(f)) != EOF){
+		if(c == '\n'){
+			lines++;
+		}
+	}
+	fclose(f);
+
+	//allocate a properly sized array
+	char **toreturn = malloc(sizeof(char*)*(lines+1));
+	f = fopen(filename, "r");
+	int i = 0;
+	int skipped = 0;
+	if(f != NULL){
+		while(fgets(s, 1024, f) != NULL){
+			removeWhitespace(s);
+			if(!(s[0]=='\0'&&strlen(s)<1)){
+				toreturn[i] = strdup(s);
+				i++;
+			}
+			else {
+				skipped++;
+			}
+		}
+		toreturn[lines-skipped] = NULL;
+		fclose(f);
+	}
+
+	return toreturn;
+}

@@ -26,11 +26,18 @@
 int main(int argc, char **argv) {
 	//Establish anything we'll need constantly.
 	int mode = 1;//Start in sequential mode.
+	int usepath = 0;//does our path file exist?
 	int futuremode = mode;//This keeps track of mode changes until the end of the line.
 	char *prompt = "s-term> ";//The prompt string.
 	printf("%s", prompt);//Print the prompt.
 	fflush(stdout);
  
+	//do pathstuff
+	char **paths = readFile("shell-config");
+	if(paths != NULL){
+		usepath = 1;
+	}
+
 	char **firststep = NULL;//The array of commands made by splitting the buffer along semicolons.
 	char ***secondstep = NULL;//The array of commands, with each command split along whitespace into its arguments.
 	
@@ -85,7 +92,7 @@ int main(int argc, char **argv) {
 					break;//Child processes handled outside the while loop.
 				}
 				if(mode==1){//Sequential mode.
-					pid_t childp = wait(&status);
+					wait(&status);
 					//Do something with childp; error checking, probably
 				}
 			}
