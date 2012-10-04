@@ -73,22 +73,26 @@ char** tokenify(char *s, const char *sep)
 	int words = 0;
 	for (word = strtok(temp1, sep);word;word = strtok(NULL,sep)){words++;}
 
-	//allocate teh array of char *'s with one additional
+	//allocate the array of char *'s with one additional
 	char **array = malloc(sizeof(char*)*(words+1));
 	int i = 0;
+	int excluded = 0;
 	for (word = strtok(temp2, sep); word; word = strtok(NULL, sep)) {
 		char *tempword = strdup(word);
 		removeWhitespace(tempword);
-		if(!(tempword[0]=='\0')){
+		if(!(tempword[0]=='\0'&&strlen(tempword)<1)){
 			array[i] = strdup(word);
 			i++;
+		}
+		else{
+			excluded++;
 		}
 		free(tempword);
 	}
 
 	free(temp1);
 	free(temp2);
-	array[words] = NULL;
+	array[words-excluded] = NULL;
 	return array;
 }
 
