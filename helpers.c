@@ -102,3 +102,24 @@ char ***tokenify2(char **s, const char *sep)
 	}
 	return toreturn;
 }
+
+void freeAll1(char **array){
+	int i = 0;
+	while(array[i]!=NULL){
+		free(array[i]);
+		i++;
+	}
+}
+
+void freeAll2(char ***array){
+	int i = 0;
+	while(array[i]!=NULL){
+		int j = 0;
+		while(array[i][j]!=NULL){
+			free(array[i][j]);
+			j++;
+		}	
+		free(array[i]);	
+		i++;
+	}
+}
