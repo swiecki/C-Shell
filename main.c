@@ -100,12 +100,33 @@ int main(int argc, char **argv) {
 		}
 		
 		if (p == 0){
+			if(usepath==1){
+				int k = 0;
+				while(paths[k] != NULL){
+					struct stat sr;
+					char tempbuffer[1024];
+					strcpy(tempbuffer, paths[k]);
+					strcat(tempbuffer, "/");
+					strcat(tempbuffer, secondstep[j][0]);
+					int rv = stat(tempbuffer, &sr);
+					if (rv < 0){
+						k++;
+					}	
+					else{
+						secondstep[j][0]=tempbuffer;
+						if(execv(secondstep[j][0],secondstep[j])<0){
+							exit(0);
+						}
+					}
+				}
+			}
 			//Execv for an actual, non-hardcoded command.
 			printf("\n%s\n",secondstep[j][0]);
 			if(execv(secondstep[j][0],secondstep[j])<0){
 				fprintf(stderr, "Your command failed, and here's why you're a bad person: %s\n", strerror(errno));
 			}
 			exit(0);//Close out the child process corpse.
+		
 		} 
 
 		if (mode==0){//Parallel mode.
