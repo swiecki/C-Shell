@@ -133,7 +133,7 @@ int main(int argc, char **argv) {
 			//Wait for each child to die.
 			int pnum = 0;
 			while(secondstep[pnum]!=NULL && secondstep[pnum][0] != NULL){
-				pid_t childp = wait(&status);//Do something with childp, probably error checking; also change this to waitpid (sequential doesn't need to be touched, only parallel)
+				//pid_t childp = wait(&status);//Do something with childp, probably error checking; also change this to waitpid (sequential doesn't need to be touched, only parallel)
 				pnum++;
 			}	
 		}
@@ -145,7 +145,11 @@ int main(int argc, char **argv) {
 		//If we don't exit, free current buffer
 		freeAll2(secondstep);	
 		free(secondstep);
-
+		
+		//Make sure firststep and secondstep have an assigned value in case of early termination.
+		firststep = NULL; 
+		secondstep = NULL;
+		
 		printf("%s", prompt);
 		fflush(stdout);
 }
