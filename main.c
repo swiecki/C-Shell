@@ -155,6 +155,12 @@ int main(int argc, char **argv) {
 			free(secondstep);
 		}
 		
+		//Free the paths array as well.
+		if(paths!=NULL){
+			freeAll1(paths);
+			free(paths);
+		}
+		
 		//Check time spent in user mode and kernel mode. Right now I've got it separated by shell and processes, but we can add it together later.
 		int idParent = RUSAGE_SELF;
 		int idChild = RUSAGE_CHILDREN;
