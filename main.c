@@ -24,7 +24,7 @@
 
 
 int main(int argc, char **argv) {
-	int mode = 1;//paralell
+	int mode = 1;//sequential
 	int futuremode = mode;
 	char *prompt = "s-term> ";
 	printf("%s", prompt);
@@ -49,7 +49,9 @@ int main(int argc, char **argv) {
 
 		int status = 0;
 
-		pid_t p = 1;
+		pid_t p = 1;	
+		//Insert some sort of pid_t p[] here, sized to the number of commands in secondstep? May come in useful when switching over to waitpid.
+
 		//execute commands in a loop:
 		while(secondstep[j] !=  NULL && secondstep[j][0] != NULL){
 			//check for exit or mode, else fork
@@ -78,7 +80,7 @@ int main(int argc, char **argv) {
 			}
 			else if(!strcasecmp(secondstep[j][0],"MODE")){
 				if(secondstep[j][1] == NULL){
-					printf("\nCurrent mode is %i\n", mode);
+					printf("\nCurrent mode is %i\n", mode);//futuremode so it will keep up with mode changes?
 				}
 				else if(!strcasecmp(secondstep[j][1],"PARALLEL") || !strcasecmp(secondstep[j][1],"p")){
 					futuremode = 0;
@@ -118,7 +120,7 @@ int main(int argc, char **argv) {
 			//For each command, wait
 			int pnum = 0;
 			while(secondstep[pnum]!=NULL && secondstep[pnum][0] != NULL){
-				pid_t childp = wait(&status);//Do something with childp, probably error checking
+				pid_t childp = wait(&status);//Do something with childp, probably error checking; also change this to waitpid (sequential doesn't need to be touched, only parallel)
 				pnum++;
 			}	
 		}
