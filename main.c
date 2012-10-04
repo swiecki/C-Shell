@@ -29,7 +29,10 @@ int main(int argc, char **argv) {
 	char *prompt = "s-term> ";
 	printf("%s", prompt);
 	fflush(stdout);
-  
+ 
+	char **firststep = NULL;
+	char ***secondstep = NULL;
+	
 	char buffer[1024];
 	while (fgets(buffer, 1024, stdin) != NULL) {
 		mode = futuremode;
@@ -39,14 +42,14 @@ int main(int argc, char **argv) {
 		
 		//Tokenize buffer by semicolons- each will be an executable command
 		
-		char **firststep = tokenify(buffer,";");
-		char ***secondstep = tokenify2(firststep," \t\n");
+		firststep = tokenify(buffer,";");
+		secondstep = tokenify2(firststep," \t\n");
 
 		freeAll1(firststep);
 		free(firststep);
 	
 		int j = 0;
-
+		int futureExit = 0;
 		int status = 0;
 
 		pid_t p = 1;	
@@ -56,27 +59,7 @@ int main(int argc, char **argv) {
 		while(secondstep[j] !=  NULL && secondstep[j][0] != NULL){
 			//check for exit or mode, else fork
 			if(!strcasecmp(secondstep[j][0],"exit")){
-				freeAll2(secondstep);
-				free(secondstep);
-				
-				//Check time spent in user mode and kernel mode. Right now I've got it separated by shell and processes, but we can add it together later.
-				int idParent = RUSAGE_SELF;
-				int idChild = RUSAGE_CHILDREN;
-				int statParent = 0;
-				int statChildren = 0;
-				struct rusage dataParent;
-				struct rusage dataChildren;
-				statParent = getrusage(idParent, &dataParent);
-				statChildren = getrusage(idChild, &dataChildren);
-				if(!statParent){//If the getrvalue operation was a success
-					printf("Shell time in user mode: %ld.%06ld seconds.\n", dataParent.ru_utime.tv_sec, dataParent.ru_utime.tv_usec);
-					printf("Shell time in kernel mode: %ld.%06ld seconds. \n", dataParent.ru_stime.tv_sec, dataParent.ru_stime.tv_usec);
-				}
-				if(!statChildren){
-					printf("Process time in user mode: %ld.%06ld seconds. \n", dataChildren.ru_utime.tv_sec, dataChildren.ru_utime.tv_usec);
-					printf("Process time in kernel mode: %ld.%06ld seconds. \n", dataChildren.ru_stime.tv_sec, dataChildren.ru_stime.tv_usec);
-				}
-				exit(0);
+				futureExit = 1;
 			}
 			else if(!strcasecmp(secondstep[j][0],"MODE")){
 				if(secondstep[j][1] == NULL){
@@ -124,14 +107,41 @@ int main(int argc, char **argv) {
 				pnum++;
 			}	
 		}
+		if(futureExit == 1){
+			break;
+		}
 
+		//If we don't exit, free current buffer stuff
 		freeAll2(secondstep);	
 		free(secondstep);
-		
+
 		printf("%s", prompt);
 		fflush(stdout);
 }
-	//Ctrl+D will drop you down here; need to make sure any cleanup also happens here too. 
+		if(secondstep != NULL){
+			freeAll2(secondstep);
+			free(secondstep);
+		}
+		
+		//Check time spent in user mode and kernel mode. Right now I've got it separated by shell and processes, but we can add it together later.
+		int idParent = RUSAGE_SELF;
+		int idChild = RUSAGE_CHILDREN;
+		int statParent = 0;
+		int statChildren = 0;
+		struct rusage dataParent;
+		struct rusage dataChildren;
+		statParent = getrusage(idParent, &dataParent);
+		statChildren = getrusage(idChild, &dataChildren);
+		if(!statParent){//If the getrvalue operation was a success
+			printf("Shell time in user mode: %ld.%06ld seconds.\n", dataParent.ru_utime.tv_sec, dataParent.ru_utime.tv_usec);
+			printf("Shell time in kernel mode: %ld.%06ld seconds. \n", dataParent.ru_stime.tv_sec, dataParent.ru_stime.tv_usec);
+		}
+		if(!statChildren){
+			printf("Process time in user mode: %ld.%06ld seconds. \n", dataChildren.ru_utime.tv_sec, dataChildren.ru_utime.tv_usec);
+			printf("Process time in kernel mode: %ld.%06ld seconds. \n", dataChildren.ru_stime.tv_sec, dataChildren.ru_stime.tv_usec);
+		}
+		exit(0);
+	//Ctrl+D will drop you down here; need to make sure any cleanup also happens here too.
 	return 0;
 }
 
