@@ -24,27 +24,29 @@
 
 
 int main(int argc, char **argv) {
-	int mode = 1;//sequential
-	int futuremode = mode;
-	char *prompt = "s-term> ";
-	printf("%s", prompt);
+	//Establish anything we'll need constantly.
+	int mode = 1;//Start in sequential mode.
+	int futuremode = mode;//This keeps track of mode changes until the end of the line.
+	char *prompt = "s-term> ";//The prompt string.
+	printf("%s", prompt);//Print the prompt.
 	fflush(stdout);
  
-	char **firststep = NULL;
-	char ***secondstep = NULL;
+	char **firststep = NULL;//The array of commands made by splitting the buffer along semicolons.
+	char ***secondstep = NULL;//The array of commands, with each command split along whitespace into its arguments.
 	
-	char buffer[1024];
-	while (fgets(buffer, 1024, stdin) != NULL) {
-		mode = futuremode;
+	char buffer[1024];//The buffer.
+	while (fgets(buffer, 1024, stdin) != NULL) {//Get input from the buffer. If it's not null, continue.
+		mode = futuremode;//Ensure that mode is up-to-date.
 
-		//remove any comment at the end of the line
+		//Remove any comments after a hash.
 		removeComment(buffer);
 		
-		//Tokenize buffer by semicolons- each will be an executable command
+		//Tokenize buffer by semicolons- each will be an executable command.
 		
 		firststep = tokenify(buffer,";");
 		secondstep = tokenify2(firststep," \t\n");
 
+		//Free firststep, as it is no longer needed. Free the sub-arrays first, then the array proper.
 		freeAll1(firststep);
 		free(firststep);
 	
@@ -55,15 +57,15 @@ int main(int argc, char **argv) {
 		pid_t p = 1;	
 		//Insert some sort of pid_t p[] here, sized to the number of commands in secondstep? May come in useful when switching over to waitpid.
 
-		//execute commands in a loop:
+		//Execute all commands in a loop.
 		while(secondstep[j] !=  NULL && secondstep[j][0] != NULL){
-			//check for exit or mode, else fork
+			//check for the special commands mode or exit. If neither of these, fork and execv.
 			if(!strcasecmp(secondstep[j][0],"exit")){
-				futureExit = 1;
+				futureExit = 1;//Will be checked at the end of the loop.
 			}
 			else if(!strcasecmp(secondstep[j][0],"MODE")){
 				if(secondstep[j][1] == NULL){
-					printf("\nCurrent mode is %i\n", mode);//futuremode so it will keep up with mode changes?
+					printf("\nCurrent mode is %i\n", mode);
 				}
 				else if(!strcasecmp(secondstep[j][1],"PARALLEL") || !strcasecmp(secondstep[j][1],"p")){
 					futuremode = 0;
@@ -72,17 +74,17 @@ int main(int argc, char **argv) {
 					futuremode = 1;
 				}
 				else {
-					//bullshit users with their bullshit commands- throw error
+					//Bullshit users with their bullshit commands - throw an error.
 					printf("\nError: Your command was pretty awful.\n");
 				}
 			}
 			else{
-				//wasn't built in command, better use execv
+				//Fork and execute/wait depending on process id.
 				p = fork();
 				if (p == 0){
-					break;
+					break;//Child processes handled outside the while loop.
 				}
-				if(mode==1){//Sequential mode
+				if(mode==1){//Sequential mode.
 					pid_t childp = wait(&status);
 					//Do something with childp; error checking, probably
 				}
@@ -96,11 +98,11 @@ int main(int argc, char **argv) {
 			if(execv(secondstep[j][0],secondstep[j])<0){
 				fprintf(stderr, "Your command failed, and here's why you're a bad person: %s\n", strerror(errno));
 			}
-			exit(0);
+			exit(0);//Close out the child process corpse.
 		} 
 
-		if (mode==0){
-			//For each command, wait
+		if (mode==0){//Parallel mode.
+			//Wait for each child to die.
 			int pnum = 0;
 			while(secondstep[pnum]!=NULL && secondstep[pnum][0] != NULL){
 				pid_t childp = wait(&status);//Do something with childp, probably error checking; also change this to waitpid (sequential doesn't need to be touched, only parallel)
