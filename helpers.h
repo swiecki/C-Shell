@@ -17,3 +17,4 @@ struct node {
 
 void listInsert(pid_t pid, char *command, int state, struct node **head);
 void listClear(struct node *list);
+void listDelete(pid_t pid, struct node **list);
