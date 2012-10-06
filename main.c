@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
 	char **firststep = NULL;//The array of commands made by splitting the buffer along semicolons.
 	char ***secondstep = NULL;//The array of commands, with each command split along whitespace into its arguments.
 		
-	struct node *head;//The head of the linked list of ongoing jobs.
+	struct node *head = NULL;//The head of the linked list of ongoing jobs.
 	
 	char buffer[1024];//The buffer.
 	while (1) {//
