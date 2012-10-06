@@ -167,3 +167,27 @@ char **readFile(char *filename){
 
 	return toreturn;
 }
+
+struct node {
+	pid_t pid;
+	char command[1024];
+	int state;
+	struct node *next;
+};
+
+void listInsert(pid_t pid, char *command, int state, struct node **head){
+	struct node *newnode = malloc(sizeof(struct node));
+	strncpy(newnode->command, command, 1024);
+	newnode->pid = pid;
+	newnode->state = state;
+	newnode->head = *head;
+	*head = newnode;
+}
+
+void listClear(struct node *list) {
+	while (list != NULL) {
+		struct node *tmp = list;
+		list = list->next;
+		free(tmp);
+	}
+}
