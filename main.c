@@ -116,7 +116,7 @@ int main(int argc, char **argv) {
 						if (canwequit){
 							futureExit = 1;//Will be checked at the end of the loop.
 						} else {
-							printf("Error: Jobs are currently running. Please wait for tasks to finish before exiting.");
+							printf("Error: Jobs are currently running. Please wait for tasks to finish before exiting.\n");
 						}
 					}
 					else if(!strcasecmp(secondstep[j][0],"pause")){
@@ -238,6 +238,9 @@ int main(int argc, char **argv) {
 				printf("%s", prompt);
 				fflush(stdout);
 				}
+			if(feof(stdin)){
+				break;//End of file or Ctrl+D
+			}
 			}
 		}
 	//on a quit, flush our command array if it's not null already
