@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
 			}
 		} else if (rv < 0){
 			//Poll went horribly wrong and we're bailing out of the flaming wreckage, screaming at the tops of our lungs.
-			printf("Polling error; shutting shell down.");
+			printf("Polling error; shutting shell down.\n");
 		} else {
 			//Keyboard I/O
 			if(fgets(buffer, 1024, stdin) != NULL){
@@ -116,7 +116,7 @@ int main(int argc, char **argv) {
 						if (canwequit){
 							futureExit = 1;//Will be checked at the end of the loop.
 						} else {
-							printf("Error: Jobs are currently running. Please wait for tasks to finish before exiting.");
+							printf("Error: Jobs are currently running. Please wait for tasks to finish before exiting.\n");
 						}
 					}
 					else if(!strcasecmp(secondstep[j][0],"pause")){
