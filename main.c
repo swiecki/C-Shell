@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
 				int pstate = waitpid((*anode).pid,&pstatus,WNOHANG);
 				if(pstate>0){
 					//Process has returned; print confirmation message and delete this node.
-					printf("Command %s was executed.\n",(*anode).command);
+					printf("Command %s, id %i was executed.\n",(*anode).command, anode->pid);
 					anode = (*anode).next;
 					listDelete(pstate, &head);
 					printPrompt = 1;
@@ -105,10 +105,42 @@ int main(int argc, char **argv) {
 				while(secondstep[j] !=  NULL && secondstep[j][0] != NULL){
 					//check for the special commands mode or exit. If neither of these, fork and execv.
 					if(!strcasecmp(secondstep[j][0],"exit")){
-						if (head == NULL){
+						int canwequit = 1;
+						struct node *tmp = head;
+						while(tmp != NULL){
+							if(tmp->state != 1){
+								canwequit = 0;
+							}
+							tmp = tmp->next;
+						}
+						if (canwequit){
 							futureExit = 1;//Will be checked at the end of the loop.
 						} else {
 							printf("Error: Jobs are currently running. Please wait for tasks to finish before exiting.");
+						}
+					}
+					else if(!strcasecmp(secondstep[j][0],"pause")){
+						setState(atoi(secondstep[j][1]), 1, head);
+						if(kill(atoi(secondstep[j][1]), SIGSTOP) != -1){
+							printf("Paused process %i\n",atoi(secondstep[j][1]));
+						}
+						else{
+							printf("Something went terribly wrong\n");
+						}
+						
+					}
+					else if(!strcasecmp(secondstep[j][0],"resume")){
+						setState(atoi(secondstep[j][1]), 0, head);
+						if(kill(atoi(secondstep[j][1]), SIGCONT) != -1){
+							printf("Resumed process %i\n",atoi(secondstep[j][1]));
+						}
+					}
+					else if(!strcasecmp(secondstep[j][0],"jobs")){
+						struct node *tmp = head;
+						printf("\npid cmd paused\n");
+						while(tmp != NULL){
+							printf("%i %s %i\n",tmp->pid,tmp->command,tmp->state);
+							tmp = tmp->next;
 						}
 					}
 					else if(!strcasecmp(secondstep[j][0],"MODE")){

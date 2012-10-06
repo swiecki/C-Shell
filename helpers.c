@@ -198,6 +198,15 @@ void listDelete(pid_t pid, struct node **list){
 	}
 }
 
+void setState(pid_t pid, int state, struct node *list){
+	while(list != NULL){
+		if(list->pid == pid){
+			list->state = state;
+		}
+		list = list->next;
+	}
+}
+
 void listClear(struct node *list) {
 	while (list != NULL) {
 		struct node *tmp = list;
