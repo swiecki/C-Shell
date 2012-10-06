@@ -28,6 +28,7 @@ int main(int argc, char **argv) {
 	int mode = 1;//Start in sequential mode.
 	int usepath = 0;//does our path file exist?
 	int futuremode = mode;//This keeps track of mode changes until the end of the line.
+	int printPrompt = 0;
 	char *prompt = "s-term> ";//The prompt string.
 	printf("%s", prompt);//Print the prompt.
 	fflush(stdout);
@@ -46,10 +47,15 @@ int main(int argc, char **argv) {
 	char buffer[1024];//The buffer.
 	while (1) {//
 		struct pollfd pfd = {0, POLLIN};
+		if(printPrompt){
+			//Need to reprint the prompt.
+			printf("%s",prompt);
+			fflush(stdout);
+			printPrompt = 0;
+		}
 		int rv = poll(&pfd, 1, 1000);
 		if (rv==0){
 			//No change, use time to do other tasks
-
 			struct node *anode = head;
 			while(anode != NULL){
 				int pstatus = 0;
@@ -58,7 +64,8 @@ int main(int argc, char **argv) {
 					//Process has returned; print confirmation message and delete this node.
 					printf("Command %s was executed.\n",(*anode).command);
 					anode = (*anode).next;
-					listDelete(pstate, &head);					
+					listDelete(pstate, &head);
+					printPrompt = 1;
 				} else if(pstate<0){
 					//Error in waitpid, print error message and break from while loop.
 					printf("Error retrieving process status.\n");
@@ -98,7 +105,11 @@ int main(int argc, char **argv) {
 				while(secondstep[j] !=  NULL && secondstep[j][0] != NULL){
 					//check for the special commands mode or exit. If neither of these, fork and execv.
 					if(!strcasecmp(secondstep[j][0],"exit")){
-						futureExit = 1;//Will be checked at the end of the loop.
+						if (head == NULL){
+							futureExit = 1;//Will be checked at the end of the loop.
+						} else {
+							printf("Error: Jobs are currently running. Please wait for tasks to finish before exiting.");
+						}
 					}
 					else if(!strcasecmp(secondstep[j][0],"MODE")){
 						if(secondstep[j][1] == NULL){
@@ -129,6 +140,8 @@ int main(int argc, char **argv) {
 						if(mode==1){//Sequential mode.
 							wait(&status);
 							//Do something with childp; error checking, probably
+						} else {//Parallel mode; add this to the list
+							listInsert(p, secondstep[j][0], 0, &head);
 						}
 					}
 					j++;
@@ -163,15 +176,7 @@ int main(int argc, char **argv) {
 					exit(0);//Close out the child process corpse.
 		
 				} 
-
-				if (mode==0){//Parallel mode.
-					//Wait for each child to die.
-					int pnum = 0;
-					while(secondstep[pnum]!=NULL && secondstep[pnum][0] != NULL){
-						//pid_t childp = wait(&status);//Do something with childp, probably error checking; also change this to waitpid (sequential doesn't need to be touched, only parallel)
-						pnum++;
-					}	
-				}
+				
 				//check if there was an exit command earlier
 				if(futureExit == 1){
 					break;
