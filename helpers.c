@@ -177,11 +177,26 @@ void listInsert(pid_t pid, char *command, int state, struct node **head){
 	*head = newnode;
 }
 
-/*void listDelete(pid_t pid, struct node *list){
-	while (list != NULL) {
-			
+void listDelete(pid_t pid, struct node **list){
+	//check if first node is the one to be deleted, adjust pointers accordingly if so, and free
+	if ((*list)->pid == pid){
+		struct node *tmp = *list;
+		*list = (*list)->next;
+		free(tmp);
+		return;
 	}
-}*/
+	struct node *tmp = *list;
+	//check if any of the rest of the nodes is the one we're deleting
+	while (tmp->next != NULL) {
+		struct node *tmpnext = tmp->next;
+		if(tmpnext->pid == pid){
+			tmp->next = tmpnext->next;
+			free(tmpnext);
+			return;
+		}
+		tmp = tmp->next;
+	}
+}
 
 void listClear(struct node *list) {
 	while (list != NULL) {
