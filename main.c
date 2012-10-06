@@ -225,6 +225,9 @@ int main(int argc, char **argv) {
 				printf("%s", prompt);
 				fflush(stdout);
 				}
+			if(feof(stdin)){
+				break;//End of file or Ctrl+D
+			}
 			}
 		}
 	//on a quit, flush our command array if it's not null already
