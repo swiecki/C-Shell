@@ -40,6 +40,8 @@ int main(int argc, char **argv) {
 
 	char **firststep = NULL;//The array of commands made by splitting the buffer along semicolons.
 	char ***secondstep = NULL;//The array of commands, with each command split along whitespace into its arguments.
+		
+	struct node *head;//The head of the linked list of ongoing jobs.
 	
 	char buffer[1024];//The buffer.
 	while (1) {//
@@ -47,7 +49,25 @@ int main(int argc, char **argv) {
 		int rv = poll(&pfd, 1, 1000);
 		if (rv==0){
 			//No change, use time to do other tasks
-			//Call waitpid on all running processes; if they're finished print confirmation messages
+
+			struct node *anode = head;
+			while(anode != NULL){
+				int pstatus = 0;
+				int pstate = waitpid((*anode).pid,&pstatus,WNOHANG);
+				if(pstate>0){
+					//Process has returned; print confirmation message and delete this node.
+					printf("Command %s was executed.\n",(*anode).command);
+					anode = (*anode).next;
+					listDelete(pstate, &head);					
+				} else if(pstate<0){
+					//Error in waitpid, print error message and break from while loop.
+					printf("Error retrieving process status.\n");
+					break;
+				} else{
+					//Process has not returned.
+					anode = (*anode).next;
+				}
+			}
 		} else if (rv < 0){
 			//Poll went horribly wrong and we're bailing out of the flaming wreckage, screaming at the tops of our lungs.
 			printf("Polling error; shutting shell down.");
