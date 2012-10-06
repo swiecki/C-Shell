@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
 			}
 		} else if (rv < 0){
 			//Poll went horribly wrong and we're bailing out of the flaming wreckage, screaming at the tops of our lungs.
-			printf("Polling error; shutting shell down.");
+			printf("Polling error; shutting the (s)hell down.");
 		} else {
 			//Keyboard I/O
 			if(fgets(buffer, 1024, stdin) != NULL){
@@ -143,6 +143,19 @@ int main(int argc, char **argv) {
 							tmp = tmp->next;
 						}
 					}
+					/*else if(!strcasecmp(secondstep[j][0],"path")&& !strcasecmp(secondstep[j][1],"refresh")){
+						if(paths != NULL){
+						freeAll1(paths);
+						free(paths);
+						}
+						//do pathstuff
+						char **paths = readFile("shell-config");
+						if(paths == NULL){
+							usepath = 0;
+						}else{
+							usepath = 1;
+						}
+					}*/
 					else if(!strcasecmp(secondstep[j][0],"MODE")){
 						if(secondstep[j][1] == NULL){
 							if(mode == 0){
